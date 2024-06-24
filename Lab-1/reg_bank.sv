@@ -1,0 +1,1 @@
+module reg_bank (input [63:0] Write_data, input RegWrite, [4:0] Write_Register, output [63:0] q)
