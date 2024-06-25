@@ -1,3 +1,5 @@
+# remove DS file exclusive for Mac
+.DS_Store
 # ignore ModelSim generated files and directories (temp files and so on)
 [_@]*
 
