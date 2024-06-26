@@ -1,9 +1,8 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /mux2_1_testbench/i0
-add wave -noupdate /mux2_1_testbench/i1
-add wave -noupdate /mux2_1_testbench/sel
-add wave -noupdate /mux2_1_testbench/out
+add wave -noupdate /decoder_1to2_testbench/inputs
+add wave -noupdate /decoder_1to2_testbench/ena
+add wave -noupdate /decoder_1to2_testbench/outputs
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {1000 ps} 0}
 quietly wave cursor active 1
