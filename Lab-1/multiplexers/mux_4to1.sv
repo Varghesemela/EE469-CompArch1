@@ -1,3 +1,5 @@
+//`include "mux_2to1.sv"
+
 module mux_4to1(out, inputs, selects);
  output logic out;
  input logic [3:0] inputs;

@@ -1,5 +1,5 @@
-`include "decoder_1to2.sv"
-`include "decoder_4to16.sv"
+//`include "decoder_1to2.sv"
+//`include "decoder_4to16.sv"
 
 module decoder_5to32 (outputs, inputs, ena);
 	input logic ena;
@@ -22,10 +22,10 @@ module decoder_5to32_testbench();
 	decoder_5to32 dut (.outputs, .inputs, .ena);
 	initial begin
 	
-	ena=0; inputs=5'b0000;  #10;
-	ena=0;  inputs=5'b0001;  #10;
-	ena=1;  inputs=5'b0010;  #10;
-	ena=1; inputs=5'b01000;  #10;
+	ena=0; #10;
+	for(int i = 0; i<32; i++) begin
+	ena=1; inputs = i; #10;
+	end
 
 	end
 endmodule

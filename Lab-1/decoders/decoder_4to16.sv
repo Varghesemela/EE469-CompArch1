@@ -1,4 +1,4 @@
-`include "decoder_2to4.sv"
+//`include "decoder_2to4.sv"
 
 module decoder_4to16 (outputs, inputs, ena);	
 	input logic ena;
