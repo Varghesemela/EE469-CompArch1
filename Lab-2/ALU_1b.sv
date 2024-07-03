@@ -6,48 +6,48 @@
 // 100:			result = bitwise A & B		value of overflow and carry_out unimportant
 // 101:			result = bitwise A | B		value of overflow and carry_out unimportant
 // 110:			result = bitwise A XOR B	value of overflow and carry_out unimportant
+`timescale 1ns/10ps
 
 
+module ALU_1b  (a, b, cin, op, cout, result);
 
-module ALU_one  (
-    input logic a,         // Input bit a
-    input logic b,         // Input bit b
-    input logic cin,       // Carry-in/borrow-in for addition/subtraction
-    input logic [2:0] op,  // Operation select signal
-	 output logic cout,
-    output logic result   // Result output bit
-);
+    input logic a;         // Input bit a
+    input logic b;         // Input bit b
+    input logic cin;       // Carry-in/borrow-in for addition/subtraction
+    input logic [2:0] op;  // Operation select signal
+	output logic cout;
+    output logic result;   // Result output bit
+    parameter DELAY = 0.05;
 
     // Internal signals
     logic sum, and_out, or_out, xor_out;
     logic add_cout, sub_cout;
-	 logic [7:0]result_array;
-	 logic add_sub_select;
-	 logic invert_b;
-	 not notb (invert_b, b);
-	 
-	 mux_2to1 select_op (.inputs({b, invert_b}), .sel(op[0]), .out(add_sub_select));
-	 fulladder FA(.a(a), .b(add_sub_select), .carry_in(cin), .carry_out(cout), .sum(sum));
-	 
-
+	logic [7:0]result_array;
+	logic add_sub_select;
+	logic notb;
+	
     // Operations
-    and andout(and_out, a, b);             // AND operation
-    or orout (or_out, a, b);              // OR operation
-    xor xorout (xor_out, a, b);             // XOR operation
+    and #DELAY andout(and_out, a, b);             // AND operation
+    or #DELAY orout (or_out, a, b);              // OR operation
+    xor #DELAY xorout (xor_out, a, b);             // XOR operation
+    not #DELAY invert_b (notb, b);
 	 
-	 assign result_array[0] = b;
-	 assign result_array[2] = sum;
-	 assign result_array[3] = sum;
-	 assign result_array[4] = and_out;
-	 assign result_array[5] = or_out;
-	 assign result_array[6] = xor_out;
+	mux_2to1 select_op (.inputs({b, notb}), .sel(op[0]), .out(add_sub_select));
+	fulladder FA(.a(a), .b(add_sub_select), .carry_in(cin), .carry_out(cout), .sum(sum));
+	  
+	assign result_array[0] = b;
+	assign result_array[2] = sum;
+	assign result_array[3] = sum;
+	assign result_array[4] = and_out;
+	assign result_array[5] = or_out;
+	assign result_array[6] = xor_out;
     
-	 mux_8to1 outselect (.out(result), .inputs(result_array), .selects(op));
+	 mux_8to1 outselect (.inputs(result_array), .selects(op), .out(result));
 
 endmodule
 
 
-module tb_ALU_one();
+module ALU_1b_testbench();
 
     // Testbench signals
     logic a;
@@ -58,7 +58,7 @@ module tb_ALU_one();
     logic result;
 
     // Instantiate the ALU_one module
-    ALU_one dut (
+    ALU_1b dut (
         .a(a),
         .b(b),
         .cin(cin),

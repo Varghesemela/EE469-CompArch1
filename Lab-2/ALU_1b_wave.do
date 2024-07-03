@@ -1,11 +1,11 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /tb_ALU_one/a 
-add wave -noupdate /tb_ALU_one/b
-add wave -noupdate /tb_ALU_one/cin 
-add wave -noupdate /tb_ALU_one/cout 
-add wave -noupdate /tb_ALU_one/op
-add wave -noupdate /tb_ALU_one/result
+add wave -noupdate /ALU_1b_testbench/a 
+add wave -noupdate /ALU_1b_testbench/b
+add wave -noupdate /ALU_1b_testbench/cin 
+add wave -noupdate /ALU_1b_testbench/cout 
+add wave -noupdate /ALU_1b_testbench/op
+add wave -noupdate /ALU_1b_testbench/result
 
 
 TreeUpdate [SetDefaultTree]
