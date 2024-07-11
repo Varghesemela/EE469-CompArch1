@@ -9,9 +9,10 @@ vlog "./flipflops/dff.sv"
 vlog "./multiplexers/mux_2to1.sv"
 vlog "./multiplexers/mux_4to1.sv"
 vlog "./multiplexers/mux_8to1.sv"
-vlog "ALU_one.sv"
-vlog "ALU_64.sv"
+vlog "ALU_1b.sv"
+vlog "ALU_64b.sv"
 vlog "./adders/full_adder.sv"
+vlog "./gates/nor_64b.sv"
 
 # Call vsim to invoke simulator
 #     Make sure the last item on the line is the name of the
@@ -25,7 +26,7 @@ vsim -voptargs="+acc" -t 1ps -lib work alustim
 #     the module you are testing.
 
 
-do ALU_64_wave.do
+do ALU_64b_wave.do
 
 # Set the window types
 view wave

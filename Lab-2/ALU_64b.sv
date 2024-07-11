@@ -2,14 +2,14 @@
 // Test bench for ALU
 `timescale 1ns/10ps
 
-module ALU_64 (
+module ALU_64b (
 				input [63:0] A, B, 
 				input [2:0] cntrl, 
 				output [63:0] result, 
 				output zero, overflow, carry_out, negative
 				);
 				
-	parameter delay = 100000;
+	parameter DELAY = 0.05;
 	logic [64:0] carry_var;	
 	assign carry_var[0] = cntrl[0];			
     generate
@@ -26,8 +26,8 @@ module ALU_64 (
         end
     endgenerate
 	 			
-	nor zero_out (zero,result[63:0]); // TODO: Need to test, if this doesnt work, create a seperate module
-	xor overflow_out (overflow, cout[64], cout[63]);
+	nor_64b zero_out (.out(zero), .inputs(result));
+	xor #DELAY overflow_out (overflow, carry_var[64], carry_var[63]);
 	assign carry_out = carry_var[64];		
 	assign negative = result[63];
 
@@ -73,7 +73,7 @@ module alustim();
 	
 		$display("%t testing PASS_A operations", $time);
 		cntrl = ALU_PASS_B;
-		for (i=0; i<100; i++) begin
+		for (i=0; i<5; i++) begin
 			A = $random(); B = $random();
 			#(delay);
 			$display("A = %b, B = %b, result = %b, z = %b, ovf = %b, neg = %b", A, B, result, zero, overflow, negative);
@@ -82,11 +82,37 @@ module alustim();
 		
 		$display("%t testing addition", $time);
 		cntrl = ALU_ADD;
-		A = 64'h0000000000000001; B = 64'h0000000000000001;
+		A = 64'hFFFFFFFFFFFFFFFF; B = 64'hFFFFFFFFFFFFFFFF;
 		#(delay);
-		assert(result == 64'h0000000000000002 && carry_out == 0 && overflow == 0 && negative == 0 && zero == 0);
+		assert(result == 64'hFFFFFFFFFFFFFFFe && carry_out == 1 && zero == 0);
+		
+		
+		$display("%t testing subtraction", $time);
+		cntrl = ALU_SUBTRACT;
+		A = 64'h0000000000000003; B = 64'h0000000000000001;
+		#(delay);
+		assert(result == 64'h0000000000000002 && overflow == 0 && negative == 0 && zero == 0);
+		
+		$display("%t testing AND", $time);
+		cntrl = ALU_AND;
+		A = 64'h00000000000000FF; B = 64'h0000000000000001;
+		#(delay);
+		assert(result == 64'h0000000000000001 && negative == 0 && zero == 0);
+		
+		$display("%t testing OR", $time);
+		cntrl = ALU_OR;
+		A = 64'h0000000000000101; B = 64'h000000000000F0F0;
+		#(delay);
+		assert(result == 64'h000000000000F1F1 && negative == 0 && zero == 0);
+		
+		$display("%t testing XOR", $time);
+		cntrl = ALU_XOR;
+		A = 64'h1111111111111001; B = 64'h0000000000000110;
+		#(delay);
+		assert(result == 64'h1111111111111111 && negative == 0 && zero == 0);
 		
 	end
+	
 endmodule
 
 

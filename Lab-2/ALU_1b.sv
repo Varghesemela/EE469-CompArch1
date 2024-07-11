@@ -9,30 +9,31 @@
 `timescale 1ns/10ps
 
 
-module ALU_1b  (a, b, cin, op, cout, result);
+module ALU_1b  (
 
-    input logic a;         // Input bit a
-    input logic b;         // Input bit b
-    input logic cin;       // Carry-in/borrow-in for addition/subtraction
-    input logic [2:0] op;  // Operation select signal
-	output logic cout;
-    output logic result;   // Result output bit
+    input logic a,         // Input bit a
+    input logic b,         // Input bit b
+    input logic cin,       // Carry-in/borrow-in for addition/subtraction
+    input logic [2:0] op,  // Operation select signal
+	 output logic cout,
+    output logic result);   // Result output bit
+	 
     parameter DELAY = 0.05;
 
-    // Internal signals
-    logic sum, and_out, or_out, xor_out;
-    logic add_cout, sub_cout;
+   // Internal signals
+   logic sum, and_out, or_out, xor_out;
+   logic add_cout, sub_cout;
 	logic [7:0]result_array;
 	logic add_sub_select;
 	logic notb;
 	
     // Operations
-    and #DELAY andout(and_out, a, b);             // AND operation
-    or #DELAY orout (or_out, a, b);              // OR operation
-    xor #DELAY xorout (xor_out, a, b);             // XOR operation
-    not #DELAY invert_b (notb, b);
+   and #DELAY andout(and_out, a, b);             // AND operation
+   or #DELAY orout (or_out, a, b);              // OR operation
+   xor #DELAY xorout (xor_out, a, b);             // XOR operation
+   not #DELAY invert_b (notb, b);
 	 
-	mux_2to1 select_op (.inputs({b, notb}), .sel(op[0]), .out(add_sub_select));
+	mux_2to1 select_op (.inputs({notb, b}), .sel(op[0]), .out(add_sub_select));
 	fulladder FA(.a(a), .b(add_sub_select), .carry_in(cin), .carry_out(cout), .sum(sum));
 	  
 	assign result_array[0] = b;

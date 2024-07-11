@@ -1,3 +1,4 @@
+`timescale 1ns/10ps
 module D_FF (
     output reg q,
     input d, reset, clk, en

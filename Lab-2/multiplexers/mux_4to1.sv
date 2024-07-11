@@ -1,5 +1,4 @@
-//`include "mux_2to1.sv"
-
+`timescale 1ns/10ps
 module mux_4to1(out, inputs, selects);
  output logic out;
  input logic [3:0] inputs;

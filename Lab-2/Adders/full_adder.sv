@@ -1,3 +1,4 @@
+`timescale 1ns/10ps
 //Full adder using structural modeling
 module fulladder (a, b, carry_in, carry_out, sum);
 	input logic a;
@@ -7,14 +8,15 @@ module fulladder (a, b, carry_in, carry_out, sum);
 	output logic sum;
 
 	logic xorout, andout1, andout2;
-
-	xor x1(xorout, a, b);
-	and (andout1, a, b);
-	and (andout2, xorout, carry_in);
-	xor x2(sum, xorout, carry_in);        //Sum output
+	parameter DELAY = 0.05;
+	
+	xor #DELAY x1(xorout, a, b);
+	and #DELAY a1(andout1, a, b);
+	and #DELAY a2(andout2, xorout, carry_in);
+	xor #DELAY x2(sum, xorout, carry_in);        //Sum output
 
 	
-	or(carry_out, andout1, andout2);     //carry output
+	or #DELAY or1(carry_out, andout1, andout2);     //carry output
 
 endmodule
 
