@@ -11,12 +11,11 @@ module pc(
 	input [31:0] pc_in;
 	output reg [31:0] pc_out;
 	
-	always @(posedge clk, posedge reset) 
-	begin
-		 if(reset)
-			  pc_out <= 32'b0;
-		 else
-			  pc_out <= pc_in;
-	end
+	genvar i;
+	generate
+		for (i = 0; i < 64; i++) begin: eachDFF
+			D_FF theDFF (.q(pc_out[i]), .d(pc_in[i]), .reset, .clk);
+		end
+	endgenerate
 
 endmodule
