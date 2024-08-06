@@ -39,7 +39,7 @@
 
 set_global_assignment -name FAMILY "Cyclone V"
 set_global_assignment -name DEVICE 5CGXFC7C7F23C8
-set_global_assignment -name TOP_LEVEL_ENTITY "Lab-3"
+set_global_assignment -name TOP_LEVEL_ENTITY single_cycle_cpu
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 17.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "19:44:07  JULY 10, 2024"
 set_global_assignment -name LAST_QUARTUS_VERSION "17.0.0 Lite Edition"
@@ -49,22 +49,28 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name SYSTEMVERILOG_FILE register.sv
-set_global_assignment -name SYSTEMVERILOG_FILE decoders/decoder_5to32.sv
-set_global_assignment -name SYSTEMVERILOG_FILE decoders/decoder_4to16.sv
-set_global_assignment -name SYSTEMVERILOG_FILE decoders/decoder_2to4.sv
-set_global_assignment -name SYSTEMVERILOG_FILE decoders/decoder_1to2.sv
-set_global_assignment -name SYSTEMVERILOG_FILE datamem.sv
-set_global_assignment -name SYSTEMVERILOG_FILE instructmem.sv
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SYSTEMVERILOG_FILE zeroExtend.sv
+set_global_assignment -name SYSTEMVERILOG_FILE signExtend.sv
+set_global_assignment -name SYSTEMVERILOG_FILE Instr_to_addr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE registerfile.sv
+set_global_assignment -name SYSTEMVERILOG_FILE register.sv
+set_global_assignment -name SYSTEMVERILOG_FILE pc_adder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE pc.sv
+set_global_assignment -name SYSTEMVERILOG_FILE nor_64b.sv
+set_global_assignment -name SYSTEMVERILOG_FILE multiplexers.sv
+set_global_assignment -name SYSTEMVERILOG_FILE left_shift_2.sv
+set_global_assignment -name SYSTEMVERILOG_FILE instructmem.sv
+set_global_assignment -name SYSTEMVERILOG_FILE full_adder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE dff.sv
+set_global_assignment -name SYSTEMVERILOG_FILE decoders.sv
+set_global_assignment -name SYSTEMVERILOG_FILE datapath_unit.sv
+set_global_assignment -name SYSTEMVERILOG_FILE datamem.sv
+set_global_assignment -name SYSTEMVERILOG_FILE control_unit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ALU_64b.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ALU_1b.sv
-set_global_assignment -name SYSTEMVERILOG_FILE multiplexers/mux_8to1.sv
-set_global_assignment -name SYSTEMVERILOG_FILE multiplexers/mux_4to1.sv
-set_global_assignment -name SYSTEMVERILOG_FILE multiplexers/mux_2to1.sv
-set_global_assignment -name SYSTEMVERILOG_FILE flipflops/dff.sv
-set_global_assignment -name SYSTEMVERILOG_FILE Adders/full_adder.sv
-set_global_assignment -name SYSTEMVERILOG_FILE gates/nor_64b.sv
-set_global_assignment -name SYSTEMVERILOG_FILE pc.sv
-set_global_assignment -name SYSTEMVERILOG_FILE imm_conversion.sv
-set_global_assignment -name SYSTEMVERILOG_FILE control_unit.sv
+set_global_assignment -name SYSTEMVERILOG_FILE single_cycle_cpu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE edff.sv

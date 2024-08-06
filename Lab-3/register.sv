@@ -1,5 +1,4 @@
-//`include "flipflops/dff.sv"
-
+`timescale 1ns/10ps
 module register (data_in, data_out, write_en, clk, reset);
 input logic [63:0] data_in;
 input logic write_en, clk, reset;
@@ -8,7 +7,7 @@ output logic [63:0] data_out;
 genvar i;
 		generate
 			for(i = 0; i < 64; i++) begin: bit_registers
-				D_FF register_out (.q(data_out[i]), .d(data_in[i]), .reset(reset), .clk(clk), .en(write_en));
+				eDFF register_out (.q(data_out[i]), .d(data_in[i]), .reset(reset), .clk(clk), .en(write_en));
 			end		
 		endgenerate
 		

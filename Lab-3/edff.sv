@@ -1,16 +1,20 @@
 `timescale 1ns/10ps
-module D_FF (
+module eDFF (
     output reg q,
     input d, reset, clk, en
 );
-    always @ (posedge clk) begin
-        if (reset) begin
-            q <= 0; // On reset, set q to 0
-        end else if (en) begin
-            q <= d; // Otherwise, q = d
-        end
-    end
+	parameter DELAY = 0.05;
+	logic not_en, w1, w2, out;
+	
+	not #DELAY n1(not_en, en);
+	and #DELAY a1(w1, d, en);
+	and #DELAY a2(w2, q, not_en);
+	or	 #DELAY o1(out, w1, w2);
+	D_FF dff1(.q, .d(out), .reset(reset), .clk(clk));
+	
 endmodule
+
+
 
 module dff_testbench();
 
@@ -19,7 +23,7 @@ module dff_testbench();
     logic q;
 
     // Instantiate the D_FF module
-    D_FF dff_inst (
+    eDFF dff_inst (
         .q(q),
         .d(d),
         .reset(reset),

@@ -34,11 +34,67 @@ module mux_5w2to1 (A, B, sel, out);
 	genvar i;
 	generate
 	for (i = 0; i < 5; i++) begin: eachMux
-			mux_2to1 theMuxes (.select(sel), .a(A[i]), .b(B[i]), .y(out[i]));
+			mux_2to1 theMuxes (.sel(sel), .inputs({B[i], A[i]}), .out(out[i]));
 		end
 	endgenerate
 endmodule
 
+module mux2_64b(out, A, B, sel);
+	input logic [63:0] A, B;
+	output logic [63:0] out;
+	input logic sel;
+	genvar i;
+	generate
+		for (i = 0; i < 64; i++) begin : mux1
+			mux_2to1 mux_64_bit (.out(out[i]), .inputs({B[i], A[i]}), .sel(sel));
+			
+		end
+	endgenerate
+	
+	endmodule
+
+
+module mux4_64b (out, A, B, C, D, sel);
+	input logic [63:0] A, B, C, D;
+	input logic [1:0] sel;
+	output logic [63:0] out;
+
+	genvar i;
+	
+	generate 
+		for (i = 0; i < 64; i++) begin : eachRouteMux
+			mux_4to1 Mux1 (.inputs({D[i], C[i], B[i], A[i]}), .selects(sel), .out(out[i]));
+		end
+	endgenerate 
+
+endmodule
+
+module mux_32to1(out, inputs, selects);
+ output logic out;
+ input logic [31:0] inputs;
+ input logic [4:0] selects;
+
+ logic [1:0] intermediate;
+
+ mux_16to1 m0(.out(intermediate[0]), .inputs(inputs[15:0]), .selects(selects[3:0]));
+ mux_16to1 m1(.out(intermediate[1]), .inputs(inputs[31:16]), .selects(selects[3:0]));
+ mux_2to1 m (.out(out), .inputs(intermediate), .sel(selects[4]));
+	 
+endmodule
+
+module mux_16to1(out, inputs, selects);
+ output logic out;
+ input logic [15:0] inputs;
+ input logic [3:0] selects;
+
+ logic [1:0] intermediate;
+
+ mux_8to1 m0(.out(intermediate[0]), .inputs(inputs[7:0]), .selects(selects[2:0]));
+ mux_8to1 m1(.out(intermediate[1]), .inputs(inputs[15:8]), .selects(selects[2:0]));
+ mux_2to1 m (.out(out), .inputs(intermediate), .sel(selects[3]));
+ 
+endmodule	
+	
 module mux_8to1(out, inputs, selects);
  output logic out;
  input logic [7:0] inputs;
@@ -64,6 +120,8 @@ module mux_4to1(out, inputs, selects);
  mux_2to1 m (.out(out), .inputs(intermediate), .sel(selects[1]));
  
 endmodule
+
+
 
 module mux_2to1(out, inputs, sel);
  output logic out;

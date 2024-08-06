@@ -1,39 +1,48 @@
-module registerfile ( clk, reset, RegWrite, WriteData, WriteRegister,ReadRegister1, ReadRegister2, ReadData1, ReadData2);
-	input logic clk, reset;
-	input logic RegWrite;
-   input logic [63:0] WriteData;	
-	input logic [4:0] ReadRegister1, ReadRegister2, WriteRegister; 
-	output logic [63:0] ReadData1, ReadData2;
-	 
-	logic [31:0][63:0] registers;
-   logic [31:0] write_enable;
-	 
-	decoder_5to32 sel_write_reg (.outputs(write_enable), .inputs(WriteRegister), .ena(RegWrite));
+module regfile (Read_reg1, Read_reg2, WriteReg, WriteData, RegWrite, Read_data1, Read_data2, clk);
+ 
+  input logic [4:0] Read_reg1, Read_reg2, WriteReg;
+  input logic [63:0] WriteData;
+  input logic RegWrite, clk;
+  output logic [63:0] Read_data1, Read_data2;
+  logic [63:0][31:0] muxin;     // input to mux
+  logic [31:0][63:0] dataout;  //output of reg
+  logic [31:0] WriteEnable;                          //decoder output
 
-    // Ensuring register 0 always reads as zero (if architecture requires it)
-    assign registers[31][63:0] = 64'b0;
+ 
+decoder_5to32 d1 (.outputs(WriteEnable), .inputs(WriteReg), .ena(RegWrite));
+integer j, k;
+	always_comb begin
+		for(j = 0; j < 64; j++)
+			for(k = 0; k < 32; k++)
+				muxin[j][k] = dataout[k][j];
+	end
 
-    // Instantiate the registers
-    generate
-        genvar i;
-        for (i = 0; i < 31; i++) begin : register_block
-            register reg_instance (
-                .data_in(WriteData),
-                .data_out(registers[i][63:0]),
-                .write_en(write_enable[i]),
-                .clk(clk),
-                .reset(reset)
-            );
-        end
-    endgenerate
-	
-	mux_64w32to1 mux_rm (.outputs(ReadData1), .registers(registers), .selects(ReadRegister1));
-	mux_64w32to1 mux_rn (.outputs(ReadData2), .registers(registers), .selects(ReadRegister2));
+genvar i;
+generate
+                                                                
+  for(i=0; i<31; i++) begin : eachD
+    Reg_dff reg1 (.data_out(dataout[i][63:0]), .data_in(WriteData[63:0]), .clk(clk),.reset(reset), .WriteEnable(WriteEnable[i])); 
+  end
+ endgenerate
 
+   Reg_dff reg31 (.data_out(dataout[31][63:0]), .data_in(64'b0), .clk(clk), .reset(1'b0), .WriteEnable(1'b1));
 
+generate
+ for (i=0; i<64;i++) begin: mux1eachbit
+   
+   mux_32to1  data1(.out(Read_data1[i]), .inputs(muxin[i][31:0]),  .selects(Read_reg1[4:0]));
+ end
+endgenerate
+generate
+ for (i=0; i<64;i++) begin: mux2eachbit
+   
+	mux_32to1  data2(.out(Read_data2[i]), .inputs(muxin[i][31:0]),  .selects(Read_reg2[4:0]));
+ end
+endgenerate
+
+ 
+ 
 endmodule
-
-
 
 // Test bench for Register file
 `timescale 1ns/10ps
@@ -44,7 +53,7 @@ module regstim();
 
 	logic	[4:0] 	ReadRegister1, ReadRegister2, WriteRegister;
 	logic [63:0]	WriteData;
-	logic 			RegWrite, clk, reset;
+	logic 			RegWrite, clk;
 	logic [63:0]	ReadData1, ReadData2;
 
 	integer i;
@@ -52,17 +61,14 @@ module regstim();
 	// Your register file MUST be named "regfile".
 	// Also you must make sure that the port declarations
 	// match up with the module instance in this stimulus file.
-	registerfile dut (.ReadData1, .ReadData2, .WriteData, 
-					 .ReadRegister1, .ReadRegister2, .WriteRegister,
-					 .RegWrite, .clk, .reset);
-					 
-					 
+	regfile dut (.Read_reg1(ReadRegister1), .Read_reg2(ReadRegister2), .WriteReg(WriteRegister), .WriteData(WriteData), .RegWrite(RegWrite), 
+	.Read_data1(ReadData1), .Read_data2(ReadData2), .clk(clk));
+
 	// Force %t's to print in a nice format.
 	initial $timeformat(-9, 2, " ns", 10);
 
 	initial begin // Set up the clock
 		clk <= 0;
-		reset <= 0;
 		forever #(ClockDelay/2) clk <= ~clk;
 	end
 
