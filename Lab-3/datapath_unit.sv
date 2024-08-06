@@ -1,12 +1,15 @@
 `timescale 1ns/10ps
 module datapath_unit (Reg2Loc, RegWrite, ALUSrc, ALUOp, MemWrite, MemToReg, MemRead, instruction,
-					 xfer_size, clk, reset, overflow, negative, zero, zeroCheck, carry_out, flagset, imm_select);
+					 xfer_size, clk, reset, overflow, negative, zero, zeroCheck, carry_out, flagset, imm_select,
+					 link_register, branch_register);
 	input logic [31:0] instruction;
 	input logic Reg2Loc, RegWrite, MemWrite, MemToReg, MemRead, flagset, imm_select;
 	input logic clk, reset;
 	input logic ALUSrc;
 	input logic [2:0] ALUOp;
 	input logic [3:0] xfer_size;
+	input logic [63:0] link_register;
+	output logic [63:0] branch_register;
 	output logic overflow, negative, zero, carry_out, zeroCheck;
 	
 	logic [4:0] Rm_or_Rd;
@@ -16,7 +19,7 @@ module datapath_unit (Reg2Loc, RegWrite, ALUSrc, ALUOp, MemWrite, MemToReg, MemR
 	logic [63:0] Dw, Da, Db;
 	registerfile register_bank (.ReadData1(Da), .ReadData2(Db), 
                             .ReadRegister1(instruction[9:5]), .ReadRegister2(Rm_or_Rd), 
-                            .WriteRegister(instruction[4:0]), .WriteData(Dw), 
+                            .WriteRegister(instruction[4:0]), .WriteData(Dw), .link_register, 
                             .RegWrite, .clk(clk), .reset(reset));
 	
 	// MOV Logic
@@ -24,13 +27,6 @@ module datapath_unit (Reg2Loc, RegWrite, ALUSrc, ALUOp, MemWrite, MemToReg, MemR
 	assign shamt = instruction[22:21];
 	
 	
-	logic [63:0] MOVZ_result, MOVK_result;
-	
-	mux4_64b movZMux (.D({instruction[20:5], 48'b0}), .C({16'b0, instruction[20:5], 32'b0}), .B({32'b0, instruction[20:5], 16'b0}), 
-	                   .A({48'b0, instruction[20:5]}), .sel(shamt), .out(MOVZ_result));
-	
-	mux4_64b movKMux (.D({instruction[20:5], Db[47:0]}), .C({Db[63:48], instruction[20:5], Db[31:0]}), .B({Db[63:32], instruction[20:5], Db[15:0]}), 
-	                   .A({Db[63:16], instruction[20:5]}), .sel(shamt), .out(MOVK_result));
 		
 	// Sign extend for DAddr9
 	logic [63:0] DAddr9_extended;
@@ -51,6 +47,7 @@ module datapath_unit (Reg2Loc, RegWrite, ALUSrc, ALUOp, MemWrite, MemToReg, MemR
 	logic negativeFlag, zeroFlag, overflowFlag, carryOutFlag;
 	ALU_64b theALU (.A(Da), .B(alub_input), .cntrl(ALUOp), .result(ALUOut), .negative(negativeFlag), .zero(zeroFlag), .overflow(overflowFlag), .carry_out(carryOutFlag));
 	
+	assign branch_register = ALUOut;
 	assign zeroCheck = zeroFlag;
 	
 	eDFF forZero (.q(zero), .d(zeroFlag), .en(flagset), .clk, .reset);

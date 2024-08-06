@@ -1,21 +1,21 @@
 `timescale 1ns/10ps
-module Instr_to_addr (clk, reset, BrTaken, UncondBr, instruction);
+module Instr_to_addr (clk, reset, BrTaken, UncondBr, instruction, blink_sig, link_register, breg_sig, branch_register);
 	parameter ClockDelay = 5000;
-	input logic clk, reset, BrTaken, UncondBr;
-	output logic [31:0]instruction;
+	input logic clk, reset, BrTaken, UncondBr, blink_sig;
+	output logic [31:0] instruction;
+	output logic [63:0] link_register;
+	input logic breg_sig;
+	input logic [63:0] branch_register;
 	logic [63:0] currentPC;
 	
 	// Instruction Fetch code 
-	//assign currentPC = 64'b0;
 	instructmem inst_fetch (.address(currentPC), .instruction(instruction), .clk(clk));
 	
 	logic [63:0] BrAddr26_extended;
-//	assign BrAddr26_extended = {{38{instruction[25]}}, instruction[25:0]};
 	signExtend #(.WIDTH(25-0+1)) BrAddr26(.in(instruction[25:0]), .out(BrAddr26_extended));
 	
 
-	logic [63:0] CondAddr19_extended;
-//	assign CondAddr19_extended = {{45{instruction[23]}}, instruction[23:5]};	
+	logic [63:0] CondAddr19_extended;	
 	signExtend #(.WIDTH(23-5+1)) CondAddr19(.in(instruction[23:5]), .out(CondAddr19_extended));
 	
 	
@@ -32,12 +32,19 @@ module Instr_to_addr (clk, reset, BrTaken, UncondBr, instruction);
 	logic [63:0]pc_plus4;
 	pc_adder pc_adder1 (.A(currentPC), .B(64'd04), .sum(pc_plus4));
 	
+	//store pc_plus4 value in link register
+	mux2_64b Alu_src_mux (.out(link_register), .A(link_register), .B(pc_plus4), .sel(blink_sig));
+
+	
+	logic [63:0] pc_branch_address;
+	mux2_64b mux_branch (.out(pc_branch_address), .A(pc_plus4), .B(pc_plus_branch), .sel(BrTaken));
 	
 	logic [63:0] pc_input_address;
-	mux2_64b mux_if (.out(pc_input_address), .A(pc_plus4), .B(pc_plus_branch), .sel(BrTaken));
+	mux2_64b mux_if (.out(pc_input_address), .A(pc_branch_address), .B(branch_register), .sel(breg_sig));
 	
 	
 	pc storePC (.clk(clk), .reset(reset), .pc_in(pc_input_address), .pc_out(currentPC));
+	
 	
 endmodule
 

@@ -1,7 +1,8 @@
-module registerfile ( clk, reset, RegWrite, WriteData, WriteRegister,ReadRegister1, ReadRegister2, ReadData1, ReadData2);
+module registerfile ( clk, reset, RegWrite, WriteData, WriteRegister,ReadRegister1, ReadRegister2, ReadData1, ReadData2, link_register);
 	input logic clk, reset;
 	input logic RegWrite;
    input logic [63:0] WriteData;	
+	input logic [63:0] link_register;
 	input logic [4:0] ReadRegister1, ReadRegister2, WriteRegister; 
 	output logic [63:0] ReadData1, ReadData2;
 	 
@@ -12,6 +13,8 @@ module registerfile ( clk, reset, RegWrite, WriteData, WriteRegister,ReadRegiste
 
     // Ensuring register 0 always reads as zero (if architecture requires it)
     assign registers[31][63:0] = 64'b0;
+	 
+	 assign registers[30][63:0] = link_register;
 
     // Instantiate the registers
     generate
